@@ -11,7 +11,7 @@
     "lint": "next lint",
     "payload": "payload",
     "generate:importmap": "payload generate:importmap",
-    "generate:types": "payload generate:types",
+    "generate:types": "node --loader ./scripts/css-loader.mjs ./node_modules/payload/bin.js generate:types",
     "migrate": "node --loader ./scripts/css-loader.mjs ./node_modules/payload/bin.js migrate",
     "migrate:create": "node --loader ./scripts/css-loader.mjs ./node_modules/payload/bin.js migrate:create",
     "migrate:reset": "node --loader ./scripts/css-loader.mjs ./node_modules/payload/bin.js migrate:reset"

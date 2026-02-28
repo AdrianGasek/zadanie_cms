@@ -72,10 +72,10 @@ export interface Config {
     categories: Category;
     posts: Post;
     pages: Page;
-    'faq-categories': FaqCategory;
-    integrations: Integration;
     'custom-collection-definitions': CustomCollectionDefinition;
     'custom-collection-entries': CustomCollectionEntry;
+    'faq-categories': FaqCategory;
+    integrations: Integration;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,10 +88,10 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
-    'faq-categories': FaqCategoriesSelect<false> | FaqCategoriesSelect<true>;
-    integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     'custom-collection-definitions': CustomCollectionDefinitionsSelect<false> | CustomCollectionDefinitionsSelect<true>;
     'custom-collection-entries': CustomCollectionEntriesSelect<false> | CustomCollectionEntriesSelect<true>;
+    'faq-categories': FaqCategoriesSelect<false> | FaqCategoriesSelect<true>;
+    integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -104,12 +104,10 @@ export interface Config {
   globals: {
     navigation: Navigation;
     footer: Footer;
-    'page-type-collections': PageTypeCollection;
   };
   globalsSelect: {
     navigation: NavigationSelect<false> | NavigationSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
-    'page-type-collections': PageTypeCollectionsSelect<false> | PageTypeCollectionsSelect<true>;
   };
   locale: 'pl' | 'en' | 'de';
   widgets: {
@@ -233,7 +231,7 @@ export interface Post {
   createdAt: string;
 }
 /**
- * Settings for FAQ, Integrations, and News pages. One document per page type. Use slug for custom paths.
+ * Strony są powiązane z danymi przez konkretny Wpis danych (Data Entry). Dane wyświetlane na stronie to entries z wybranej definicji / wbudowanej kolekcji albo jeden wybrany Data Entry.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
@@ -241,13 +239,9 @@ export interface Post {
 export interface Page {
   id: number;
   /**
-   * Klucz typu strony – musi być identyczny z polem "Page type key" w Globals → Page Type Collections (np. faq, integrations, news). Nowe typy dodaj najpierw w Page Type Collections.
+   * Opcjonalnie: powiąż tę stronę z konkretnym Wpisem danych (Data Entry). Gdy ustawione, na stronie wyświetlany będzie ten jeden wpis zamiast listy entries z Typu strony.
    */
-  pageType: string;
-  /**
-   * Opcjonalnie: powiąż tę stronę z konkretnym Wpisem danych (Data Entry).
-   */
-  dataEntry?: number | { id: number } | null;
+  dataEntry?: (number | null) | CustomCollectionEntry;
   /**
    * Custom URL path (e.g. "pricing", "about"). If empty, path is determined by page type (faq, integrations, news).
    */
@@ -282,6 +276,110 @@ export interface Page {
           }
       )[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Produkcyjna wersja zestawu danych: podaj nazwę systemową (np. "cennik 1 szkic"), wybierz definicję danych, zapisz. Po wejściu w zapisany wpis dodawaj dane przyciskiem i polami klucz: wartość z definicji. Stronę możesz powiązać z konkretnym Data Entry w kolekcji Strony.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "custom-collection-entries".
+ */
+export interface CustomCollectionEntry {
+  id: number;
+  /**
+   * Nazwa dla CMS (np. "cennik 1 szkic") – identyfikuje ten wpis w panelu. Po zapisaniu wpisu wybierz definicję danych i dodaj dane (klucz: wartość) w polu Dane.
+   */
+  systemName: string;
+  /**
+   * Wybierz definicję (np. Cennik). Pola w "Dane" zależą od tej definicji – wypełnij i zapisz, aby dodać wpis do listy.
+   */
+  customCollection: number | CustomCollectionDefinition;
+  /**
+   * Sortowanie (mniejsza wartość = wyżej).
+   */
+  sortOrder?: number | null;
+  /**
+   * Dodawaj wpisy danych przyciskiem „Dodaj wpis danych”. Każdy wpis to zestaw pól z definicji (klucz: wartość). Zapisując dokument, wartości trafią do bazy jako JSON (tablica obiektów).
+   */
+  data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Struktura danych: nazwy pól, typy (tekst, liczba, data, select…), kolejność. Definicję używasz w Typ stron jako źródło danych oraz w Wpisach danych – tam wypełniasz formularz i zapisujesz produkcyjne wpisy (np. listę cenników).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "custom-collection-definitions".
+ */
+export interface CustomCollectionDefinition {
+  id: number;
+  /**
+   * Czytelna nazwa, np. "Cennik", "PricesList" (używana w panelu).
+   */
+  name: string;
+  /**
+   * Unikalny klucz kolekcji (np. cennik, prices). Powiązanie między definicją danych a wpisami w Data Entries – ten sam klucz wpisuj w Typ stron jako "Klucz typu", żeby strona ładowała entries z tej definicji.
+   */
+  slug: string;
+  /**
+   * Klucz pola (z listy poniżej), które ma być wyświetlane jako tytuł w liście wpisów. Zostaw puste, jeśli nie dotyczy.
+   */
+  useAsTitle?: string | null;
+  /**
+   * Zdefiniuj pola wpisów: klucz, etykieta, typ (tekst, rich text, obraz z Media, grupa zagnieżdżona do 3 poziomów itd.), kolejność.
+   */
+  fields: {
+    /**
+     * Nazwa techniczna bez spacji (np. price, productName).
+     */
+    key: string;
+    /**
+     * Czytelna nazwa w formularzu (np. "Cena", "Nazwa produktu").
+     */
+    label: string;
+    type: 'text' | 'textarea' | 'richText' | 'number' | 'date' | 'checkbox' | 'select' | 'image' | 'group';
+    required?: boolean | null;
+    /**
+     * Jedna opcja w każdej linii (tylko dla typu Select).
+     */
+    options?: string | null;
+    /**
+     * Maks. 3 poziomy. W grupie możesz dodać kolejną grupę (poziom 3).
+     */
+    nestedFields?:
+      | {
+          key: string;
+          label: string;
+          type: 'text' | 'textarea' | 'richText' | 'number' | 'date' | 'checkbox' | 'select' | 'image' | 'group';
+          required?: boolean | null;
+          options?: string | null;
+          /**
+           * Ostatni poziom (max 3).
+           */
+          level3Fields?:
+            | {
+                key: string;
+                label: string;
+                type: 'text' | 'textarea' | 'richText' | 'number' | 'date' | 'checkbox' | 'select' | 'image';
+                required?: boolean | null;
+                options?: string | null;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -324,84 +422,6 @@ export interface Integration {
    * Display order (lower = first)
    */
   sortOrder?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Definicje własnych kolekcji danych (np. Cennik, Cenniki). Tutaj nazywasz kolekcję i dodajesz pola (nazwa, typ). Później w Page Type Collections wybierasz tę kolekcję i dodajesz wpisy w Custom Collection Entries.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "custom-collection-definitions".
- */
-export interface CustomCollectionDefinition {
-  id: number;
-  /**
-   * Czytelna nazwa, np. "Cennik", "PricesList" (używana w panelu).
-   */
-  name: string;
-  /**
-   * Unikalny identyfikator bez spacji (np. prices-list, cennik). Używany jako pageType w Pages – wpisz ten sam klucz w "Page type key" w Page Type Collections.
-   */
-  slug: string;
-  /**
-   * Klucz pola (z listy poniżej), które ma być wyświetlane jako tytuł w liście wpisów. Zostaw puste, jeśli nie dotyczy.
-   */
-  useAsTitle?: string | null;
-  /**
-   * Zdefiniuj pola, które będą miały wpisy tej kolekcji (nazwa, typ, opcjonalnie opcje dla select).
-   */
-  fields: {
-    /**
-     * Nazwa techniczna bez spacji (np. price, productName).
-     */
-    key: string;
-    /**
-     * Czytelna nazwa w formularzu (np. "Cena", "Nazwa produktu").
-     */
-    label: string;
-    type: 'text' | 'textarea' | 'number' | 'date' | 'checkbox' | 'select';
-    required?: boolean | null;
-    /**
-     * Jedna opcja w każdej linii (tylko dla typu Select).
-     */
-    options?: string | null;
-    id?: string | null;
-  }[];
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Wpisy do własnych kolekcji. Wybierz definicję kolekcji (np. Cennik), następnie wypełnij pola w sekcji "Dane" zgodnie z definicją.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "custom-collection-entries".
- */
-export interface CustomCollectionEntry {
-  id: number;
-  /**
-   * Nazwa systemowa w CMS (np. "cennik 1 szkic").
-   */
-  systemName: string;
-  /**
-   * Wybierz definicję kolekcji (np. Cennik). Pola w "Dane" zależą od tej definicji.
-   */
-  customCollection: number | CustomCollectionDefinition;
-  /**
-   * Sortowanie (mniejsza wartość = wyżej).
-   */
-  sortOrder?: number | null;
-  /**
-   * Wartości pól zdefiniowanych w wybranej kolekcji. Klucze muszą odpowiadać "Kluczowi pola" z definicji (np. {"productName": "Usługa A", "price": 100}).
-   */
-  data:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -450,20 +470,20 @@ export interface PayloadLockedDocument {
         value: number | Page;
       } | null)
     | ({
-        relationTo: 'faq-categories';
-        value: number | FaqCategory;
-      } | null)
-    | ({
-        relationTo: 'integrations';
-        value: number | Integration;
-      } | null)
-    | ({
         relationTo: 'custom-collection-definitions';
         value: number | CustomCollectionDefinition;
       } | null)
     | ({
         relationTo: 'custom-collection-entries';
         value: number | CustomCollectionEntry;
+      } | null)
+    | ({
+        relationTo: 'faq-categories';
+        value: number | FaqCategory;
+      } | null)
+    | ({
+        relationTo: 'integrations';
+        value: number | Integration;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -579,7 +599,7 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
-  pageType?: T;
+  dataEntry?: T;
   slug?: T;
   title?: T;
   shortDescription?: T;
@@ -616,6 +636,59 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "custom-collection-definitions_select".
+ */
+export interface CustomCollectionDefinitionsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  useAsTitle?: T;
+  fields?:
+    | T
+    | {
+        key?: T;
+        label?: T;
+        type?: T;
+        required?: T;
+        options?: T;
+        nestedFields?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              type?: T;
+              required?: T;
+              options?: T;
+              level3Fields?:
+                | T
+                | {
+                    key?: T;
+                    label?: T;
+                    type?: T;
+                    required?: T;
+                    options?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "custom-collection-entries_select".
+ */
+export interface CustomCollectionEntriesSelect<T extends boolean = true> {
+  systemName?: T;
+  customCollection?: T;
+  sortOrder?: T;
+  data?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faq-categories_select".
  */
 export interface FaqCategoriesSelect<T extends boolean = true> {
@@ -641,38 +714,6 @@ export interface IntegrationsSelect<T extends boolean = true> {
   shortDescription?: T;
   logo?: T;
   sortOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "custom-collection-definitions_select".
- */
-export interface CustomCollectionDefinitionsSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  useAsTitle?: T;
-  fields?:
-    | T
-    | {
-        key?: T;
-        label?: T;
-        type?: T;
-        required?: T;
-        options?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "custom-collection-entries_select".
- */
-export interface CustomCollectionEntriesSelect<T extends boolean = true> {
-  customCollection?: T;
-  sortOrder?: T;
-  data?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -771,53 +812,6 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
- * Mapowanie typów stron (pageType) na kolekcje Payload. Każdy wpis definiuje, skąd pobierać dane dla strony o danym typie. Dodaj nowy wpis, aby dodać własny typ strony (np. testimonials).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "page-type-collections".
- */
-export interface PageTypeCollection {
-  id: number;
-  /**
-   * Dodaj wpis dla każdego typu strony, który ma ładować dane z kolekcji. W kolekcji Pages ustaw pageType na wartość "Page type key" z tego wpisu.
-   */
-  entries?:
-    | {
-        /**
-         * Unikalny identyfikator (np. faq, integrations, news, testimonials). Ta wartość wybierana jest w dokumencie strony (Pages) w polu Page type.
-         */
-        pageType: string;
-        /**
-         * Czytelna nazwa w panelu (np. FAQ, Integrations, News).
-         */
-        label: string;
-        /**
-         * Kolekcja Payload, z której pobierane są dokumenty jako dane strony.
-         */
-        collection: 'faq-categories' | 'integrations' | 'posts' | 'categories' | 'custom-collection-entries';
-        /**
-         * Pole sortowania (np. sortOrder, -publishedAt, name). Minus = malejąco.
-         */
-        sort: string;
-        /**
-         * Maksymalna liczba dokumentów do pobrania.
-         */
-        limit: number;
-        /**
-         * Głębokość zagnieżdżeń (relacje). Zazwyczaj 1.
-         */
-        depth: number;
-        /**
-         * Wymagane, gdy Collection = "Custom (własna kolekcja)". Wybierz wcześniej utworzoną definicję (np. Cennik).
-         */
-        customCollectionDefinition?: (number | null) | CustomCollectionDefinition;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "navigation_select".
  */
@@ -856,27 +850,6 @@ export interface FooterSelect<T extends boolean = true> {
               url?: T;
               id?: T;
             };
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "page-type-collections_select".
- */
-export interface PageTypeCollectionsSelect<T extends boolean = true> {
-  entries?:
-    | T
-    | {
-        pageType?: T;
-        label?: T;
-        collection?: T;
-        sort?: T;
-        limit?: T;
-        depth?: T;
-        customCollectionDefinition?: T;
         id?: T;
       };
   updatedAt?: T;

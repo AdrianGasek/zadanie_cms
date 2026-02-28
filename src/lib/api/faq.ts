@@ -6,7 +6,7 @@ export async function getFaqPageSettings(locale: string = DEFAULT_LOCALE) {
   const payload = await getPayload()
   const result = await payload.find({
     collection: 'pages',
-    where: { pageType: { equals: 'faq' } },
+    where: { slug: { equals: 'faq' } },
     locale: locale as 'pl' | 'en' | 'de',
     limit: 1,
     depth: 0,

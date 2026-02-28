@@ -14,7 +14,6 @@ import { CustomCollectionDefinitions } from './src/collections/CustomCollectionD
 import { CustomCollectionEntries } from './src/collections/CustomCollectionEntries'
 import { Navigation } from './src/globals/Navigation'
 import { Footer } from './src/globals/Footer'
-import { PageTypeCollections } from './src/globals/PageTypeCollections'
 
 export default buildConfig({
   editor: lexicalEditor(),
@@ -29,7 +28,7 @@ export default buildConfig({
     FaqCategories,
     Integrations,
   ],
-  globals: [Navigation, Footer, PageTypeCollections],
+  globals: [Navigation, Footer],
   secret: process.env.PAYLOAD_SECRET || '',
   db: postgresAdapter({
     pool: {

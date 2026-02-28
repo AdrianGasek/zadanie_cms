@@ -53,10 +53,6 @@ media/
 
 # Projekt – wskazane pliki i katalogi
 PROJECT.md
-src/components/admin/CustomCollectionDataField.tsx
-src/components/admin/PageTypeCollectionSelectField.tsx
-src/components/admin/PageTypeSelectField.tsx
-src/globals/PageTypeCollections.ts
+src/components/admin/
 src/app/(payload)/
 src/app/(frontend)/
-scripts/

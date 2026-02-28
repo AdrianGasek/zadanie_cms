@@ -6,7 +6,7 @@ export async function getIntegrationsPageSettings(locale: string = DEFAULT_LOCAL
   const payload = await getPayload()
   const result = await payload.find({
     collection: 'pages',
-    where: { pageType: { equals: 'integrations' } },
+    where: { slug: { equals: 'integrations' } },
     locale: locale as 'pl' | 'en' | 'de',
     limit: 1,
     depth: 0,

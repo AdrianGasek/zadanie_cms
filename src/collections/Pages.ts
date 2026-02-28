@@ -13,7 +13,7 @@ export const Pages: CollectionConfig = {
     defaultColumns: ['title', 'dataEntry', 'slug', 'updatedAt'],
     group: 'Content',
     description:
-      'Strony są powiązane z wpisami danych przez typ strony (pole Typ strony) lub przez konkretny Wpis danych. Dane wyświetlane na stronie to entries z wybranej definicji / wbudowanej kolekcji albo jeden wybrany Data Entry – konfiguracja w Content → Typ stron.',
+      'Strony są powiązane z danymi przez konkretny Wpis danych (Data Entry). Dane wyświetlane na stronie to entries z wybranej definicji / wbudowanej kolekcji albo jeden wybrany Data Entry.',
   },
   labels: {
     singular: { pl: 'Strona', en: 'Page', de: 'Seite' },

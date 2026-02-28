@@ -54,7 +54,7 @@ Projekt zawiera **część serwerową**: konfigurację Payload CMS, API Next.js,
 - **Users** — auth (email/hasło), role: admin, editor.
 - **Categories** — nazwa, slug (lokalizowane: pl, en, de).
 - **Posts** — tytuł, slug, shortDescription, featuredImage, publishedAt, readTimeMinutes, categories, content (Lexical rich text). Pola tekstowe z lokalizacją.
-- **Pages** — strony typu (powiązane z PageTypeCollections).
+- **Pages** — strony powiązane tylko z kolekcjami danych (np. wpis z Custom Collection Entries). Identyfikacja po slug (np. `news`, `faq`, `integrations`). Dane na stronie z pola Wpis danych (dataEntry).
 - **CustomCollectionDefinitions** — definicje własnych kolekcji (schemat pól).
 - **CustomCollectionEntries** — wpisy do kolekcji zdefiniowanych w CustomCollectionDefinitions.
 - **FaqCategories** — kategorie FAQ.
@@ -64,7 +64,6 @@ Projekt zawiera **część serwerową**: konfigurację Payload CMS, API Next.js,
 
 - **Navigation** — zakładki menu (np. Platform, Integrations, Resources), każda z tablicą `menuItems` (label, url). Konfigurowalne, rozbudowywalne.
 - **Footer** — contact (email, telefon) oraz kolumny linków (np. rejestracja, sign in, search, privacy policy, terms, FAQ).
-- **PageTypeCollections** — powiązanie typów stron z kolekcjami Payload (dla stron dynamicznych).
 
 ### Internacjonalizacja
 
@@ -85,7 +84,6 @@ Projekt zawiera **część serwerową**: konfigurację Payload CMS, API Next.js,
 | `GET /api/integrations-page-settings` | Ustawienia strony integracji (query: `locale`) |
 | `GET /api/faq` | FAQ (query: `locale`) |
 | `GET /api/faq-page-settings` | Ustawienia strony FAQ (query: `locale`) |
-| `GET /api/page-types` | Typy stron (dla routingu dynamicznego) |
 | `GET /api/custom-collection-definitions/[id]/fields` | Pola definicji własnej kolekcji |
 
 Payload REST (kolekcje, globals, auth) jest pod ścieżką `/api/*` obsługiwaną przez Payload (np. `/api/posts`, `/api/users`, `/api/globals/navigation`).
@@ -103,9 +101,9 @@ src/
   app/
     (payload)/          # Payload admin + REST
     (frontend)/         # Widoki: news, news-post/[slug]
-    api/                # Custom API (news, news-categories, navigation, footer, news-page-settings, integrations, faq, page-types, custom-collection-definitions)
+    api/                # Custom API (news, news-categories, navigation, footer, news-page-settings, integrations, faq, custom-collection-definitions)
   collections/          # Payload: Media, Users, Categories, Posts, Pages, CustomCollectionDefinitions, CustomCollectionEntries, FaqCategories, Integrations
-  globals/              # Payload: Navigation, Footer, PageTypeCollections
+  globals/              # Payload: Navigation, Footer
   lib/
     payload.ts          # getPayload() — cache instancji
     api/

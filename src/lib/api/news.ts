@@ -6,7 +6,7 @@ export async function getNewsPageSettings(locale: string = DEFAULT_LOCALE) {
   const payload = await getPayload()
   const result = await payload.find({
     collection: 'pages',
-    where: { pageType: { equals: 'news' } },
+    where: { slug: { equals: 'news' } },
     locale: locale as 'pl' | 'en' | 'de',
     limit: 1,
     depth: 0,
