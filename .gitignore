@@ -56,3 +56,5 @@ PROJECT.md
 src/components/admin/
 src/app/(payload)/
 src/app/(frontend)/
+src/app/api/
+src/migrations/
