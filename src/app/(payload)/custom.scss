@@ -1,0 +1,290 @@
+/* Custom Payload admin theme – Nord-inspired (cold blue/slate) */
+
+@layer payload {
+  :root {
+    /* Nord palette – base grays */
+    --color-base-0: #eceff4;
+    --color-base-50: #e5e9f0;
+    --color-base-100: #d8dee9;
+    --color-base-150: #c4ccd9;
+    --color-base-200: #b0bac9;
+    --color-base-250: #9ca6b8;
+    --color-base-300: #8890a7;
+    --color-base-350: #747b96;
+    --color-base-400: #616e88;
+    --color-base-450: #4c566a;
+    --color-base-500: #434c5e;
+    --color-base-550: #3b4252;
+    --color-base-600: #2e3440;
+    --color-base-650: #2b313c;
+    --color-base-700: #252b33;
+    --color-base-750: #1e2329;
+    --color-base-800: #2e3440;
+    --color-base-850: #242933;
+    --color-base-900: #2e3440;
+    --color-base-950: #1a1e26;
+    --color-base-1000: #0d0f12;
+
+    /* Nord frost – success/primary (blue) */
+    --color-success-50: #eef6fc;
+    --color-success-100: #d9ebf8;
+    --color-success-150: #b8daf2;
+    --color-success-200: #8ec5e8;
+    --color-success-250: #5eb0de;
+    --color-success-300: #3d9bd4;
+    --color-success-350: #2689c9;
+    --color-success-400: #1478bd;
+    --color-success-500: #0880bf;
+    --color-success-550: #076a9e;
+    --color-success-600: #06557e;
+    --color-success-650: #054160;
+    --color-success-700: #042f45;
+    --color-success-750: #031f2e;
+    --color-success-800: #021419;
+    --color-success-850: #010d12;
+    --color-success-900: #00080b;
+    --color-success-950: #000405;
+
+    /* Nord aurora – error (red) */
+    --color-error-500: #bf616a;
+    --color-error-400: #d4878f;
+    --color-error-300: #e8a5ac;
+
+    /* Nord aurora – warning (orange) */
+    --color-warning-500: #d08770;
+    --color-warning-400: #e0a090;
+    --color-warning-300: #e8b4a0;
+
+    /* Theme mapping */
+    --theme-bg: var(--theme-elevation-0);
+    --theme-text: var(--theme-elevation-800);
+    --theme-input-bg: var(--theme-elevation-0);
+    --theme-border-color: var(--theme-elevation-150);
+    --theme-overlay: rgba(13, 15, 18, 0.6);
+
+    /* Softer radius */
+    --style-radius-s: 6px;
+    --style-radius-m: 8px;
+    --style-radius-l: 12px;
+
+    /* Typography – clean sans, większe czcionki */
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* Większe czcionki w panelu (base 20px → 22px, body 13px → 14px) */
+    --base-px: 22;
+    --base-body-size: 14;
+  }
+
+  html[data-theme='dark'] {
+    --theme-bg: #0d0f12;
+    --theme-text: #d8dee9;
+    --theme-input-bg: #1a1e26;
+    --theme-overlay: rgba(0, 0, 0, 0.75);
+  }
+
+  /* Global admin shell */
+  html {
+    background: var(--theme-bg);
+  }
+
+  /* Sidebar (lewa kolumna z nawigacją) – większe czcionki */
+  body aside:first-of-type,
+  [class*='template-default'] > div:first-child:has(.nav-group),
+  #app > div > div:first-child:has(.nav-group) {
+    background: linear-gradient(180deg, var(--theme-elevation-50) 0%, var(--theme-elevation-100) 100%);
+    border-right: 1px solid var(--theme-elevation-150);
+    font-size: 1.1rem;
+  }
+
+  html[data-theme='dark'] body aside:first-of-type,
+  html[data-theme='dark'] [class*='template-default'] > div:first-child:has(.nav-group),
+  html[data-theme='dark'] #app > div > div:first-child:has(.nav-group) {
+    background: linear-gradient(180deg, #15181f 0%, #1a1e26 100%);
+    border-right-color: var(--theme-elevation-200);
+  }
+
+  /* Nawigacja w sidebarze – większe czcionki, strzałki w kolorze tekstu */
+  .nav-group {
+    font-size: 1.1rem;
+
+    .nav-group__label {
+      font-weight: 700;
+      text-decoration: underline;
+      color: var(--theme-text);
+      font-size: 1.15rem;
+    }
+
+    .nav-group__toggle {
+      color: var(--theme-text);
+      font-size: 1.1rem;
+      background: var(--theme-elevation-100);
+      border-radius: var(--style-radius-s);
+      padding: calc(var(--base) * 0.25) calc(var(--base) * 0.4);
+
+      &:hover,
+      &:focus-visible {
+        background: var(--theme-elevation-150);
+      }
+    }
+
+    .nav-group__toggle,
+    a {
+      color: var(--theme-text);
+      font-size: 1.1rem;
+    }
+
+    .nav-group__indicator svg .stroke,
+    .nav-group__indicator .icon--chevron .stroke {
+      stroke: var(--theme-text);
+    }
+
+    .nav-group__content {
+      padding-left: calc(var(--base) * 0.6);
+    }
+  }
+
+  /* Ikony strzałek (chevron up/down, arrow) – kolor jak tekst w całym panelu */
+  .icon--chevron {
+    color: var(--theme-text);
+  }
+
+  .icon--chevron .stroke {
+    stroke: var(--theme-text);
+  }
+
+  /* Collapsible (zwijane sekcje) – strzałka w kolorze tekstu */
+  .collapsible .icon--chevron,
+  .collapsible .icon--chevron .stroke {
+    color: var(--theme-text);
+    stroke: var(--theme-text);
+  }
+
+  /* Select/dropdown – strzałka w kolorze tekstu */
+  .react-select__indicator {
+    color: var(--theme-text);
+  }
+
+  .react-select__indicator svg {
+    fill: var(--theme-text);
+  }
+
+  /* Header / doc controls bar */
+  .doc-controls {
+    background: var(--theme-elevation-0);
+    border-bottom: 1px solid var(--theme-border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  html[data-theme='dark'] .doc-controls {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Cards and list rows – hover */
+  .collection-list__wrap tbody tr:hover,
+  .card {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .card {
+    border-radius: var(--style-radius-m);
+    border: 1px solid var(--theme-elevation-150);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Buttons – primary uses Nord blue (Payload uses --bg-color, --hover-bg) */
+  .btn--style-primary {
+    --bg-color: #5e81ac;
+    --hover-bg: #6b8cb8;
+    --color: #eceff4;
+    border-radius: var(--style-radius-s);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+
+  .btn--style-primary:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Inputs */
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='number'],
+  textarea,
+  .react-select__control {
+    border-radius: var(--style-radius-s) !important;
+    border-color: var(--theme-elevation-200) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: #5e81ac !important;
+    box-shadow: 0 0 0 2px rgba(94, 129, 172, 0.25) !important;
+  }
+
+  /* Dashboard welcome block */
+  .dashboard {
+    background: var(--theme-bg);
+  }
+
+  .dashboard__greeting {
+    color: var(--theme-text);
+    font-weight: 600;
+  }
+
+  /* Tabs */
+  .tabs__tab {
+    border-radius: var(--style-radius-s) var(--style-radius-s) 0 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .tabs__tab--active {
+    background: var(--theme-elevation-100);
+    color: var(--theme-success-600);
+    font-weight: 500;
+  }
+
+  /* Toasts / notifications */
+  .toast {
+    border-radius: var(--style-radius-m);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(94, 129, 172, 0.35);
+    color: var(--theme-elevation-900);
+  }
+
+  ::-moz-selection {
+    background: rgba(94, 129, 172, 0.35);
+    color: var(--theme-elevation-900);
+  }
+
+  /* Scrollbar – narrow and styled (Webkit) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--theme-elevation-100);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--theme-elevation-300);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-elevation-400);
+  }
+
+  html[data-theme='dark'] ::-webkit-scrollbar-track {
+    background: var(--theme-elevation-100);
+  }
+
+  html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+    background: var(--theme-elevation-250);
+  }
+}

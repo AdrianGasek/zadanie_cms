@@ -1,7 +1,6 @@
 import { getPayload } from '@/lib/payload'
+import { normalizeLocale } from '@/lib/i18n/config'
 import type { Page } from '../../../payload-types'
-
-const DEFAULT_LOCALE = 'pl'
 
 type DefinitionFieldShape = { key?: string; type?: string; fields?: DefinitionFieldShape[]; nestedFields?: DefinitionFieldShape[]; level3Fields?: DefinitionFieldShape[] }
 
@@ -44,18 +43,23 @@ export type PageWithData = {
   data?: PageCollectionData
 }
 
+type DataSourceBlock =
+  | { blockType: 'customDataset'; key: string; entry: number | { id: number } }
+  | { blockType: 'posts'; key: string; limit?: number | null }
+  | { blockType: 'integrations'; key: string; limit?: number | null }
+  | { blockType: 'faqCategories'; key: string; limit?: number | null }
+
 /**
  * Pobiera stronę z kolekcji Pages po slug.
- * Gdy strona ma ustawiony Wpis danych (dataEntry), dołącza dane z tego wpisu do result.data.
- * Pages powiązujemy tylko z kolekcjami danych (Custom Collection Entries).
+ * Źródła danych są konfigurowane w polu dataSources (wiele sekcji). Jeśli puste, fallback do legacy dataEntry.
  */
 export async function getPageBySlug(
   slug: string,
-  locale: string = DEFAULT_LOCALE,
+  locale: string = 'pl',
 ): Promise<PageWithData | null> {
   const normalizedSlug = slug.toLowerCase()
   const payload = await getPayload()
-  const localeFilter = locale as 'pl' | 'en' | 'de'
+  const localeFilter = normalizeLocale(locale) as 'pl' | 'en' | 'de'
 
   const bySlug = await payload.find({
     collection: 'pages',
@@ -68,6 +72,105 @@ export async function getPageBySlug(
   if (!page) return null
 
   const result: PageWithData = { page }
+
+  const sourcesRaw = (page as unknown as { dataSources?: unknown }).dataSources
+  const sources = Array.isArray(sourcesRaw) ? (sourcesRaw as DataSourceBlock[]) : []
+  if (sources.length > 0) {
+    const data: PageCollectionData = {}
+
+    for (const src of sources) {
+      const key = typeof src?.key === 'string' && src.key.length > 0 ? src.key : undefined
+      if (!key) continue
+
+      if (src.blockType === 'customDataset') {
+        const entryId =
+          src.entry != null && typeof src.entry === 'object' && 'id' in src.entry
+            ? (src.entry as { id: number }).id
+            : typeof src.entry === 'number'
+              ? src.entry
+              : null
+        if (entryId == null) continue
+
+        const entryDoc = await payload.findByID({
+          collection: 'custom-collection-entries',
+          id: entryId,
+          locale: localeFilter,
+          depth: 1,
+        })
+        const definition =
+          entryDoc?.customCollection && typeof entryDoc.customCollection === 'object'
+            ? entryDoc.customCollection
+            : null
+        const useAsTitle =
+          definition && typeof definition === 'object' && 'useAsTitle' in definition
+            ? (definition as { useAsTitle?: string }).useAsTitle
+            : undefined
+        const definitionFields =
+          definition && typeof definition === 'object' && 'fields' in definition
+            ? (definition as { fields?: DefinitionFieldShape[] }).fields
+            : undefined
+        const rawData = (entryDoc as { data?: Record<string, unknown> | Record<string, unknown>[] }).data
+        const rows = Array.isArray(rawData)
+          ? rawData.filter((r): r is Record<string, unknown> => r != null && typeof r === 'object' && !Array.isArray(r))
+          : rawData != null && typeof rawData === 'object'
+            ? [rawData as Record<string, unknown>]
+            : []
+        const enrichedEntries = await Promise.all(
+          rows.map(async (row) => ({
+            ...entryDoc,
+            data: await enrichImageFieldsInData(row, definitionFields, payload),
+            _useAsTitle: useAsTitle,
+            _definitionFields: definitionFields,
+          })),
+        )
+
+        data[key] = enrichedEntries
+        continue
+      }
+
+      if (src.blockType === 'posts') {
+        const limit = typeof src.limit === 'number' && src.limit > 0 ? src.limit : 12
+        const posts = await payload.find({
+          collection: 'posts',
+          locale: localeFilter,
+          limit,
+          sort: '-publishedAt',
+          depth: 1,
+        })
+        data[key] = posts.docs as unknown[]
+        continue
+      }
+
+      if (src.blockType === 'integrations') {
+        const limit = typeof src.limit === 'number' && src.limit > 0 ? src.limit : 200
+        const integrations = await payload.find({
+          collection: 'integrations',
+          locale: localeFilter,
+          limit,
+          sort: 'sortOrder',
+          depth: 1,
+        })
+        data[key] = integrations.docs as unknown[]
+        continue
+      }
+
+      if (src.blockType === 'faqCategories') {
+        const limit = typeof src.limit === 'number' && src.limit > 0 ? src.limit : 100
+        const categories = await payload.find({
+          collection: 'faq-categories',
+          locale: localeFilter,
+          limit,
+          sort: 'sortOrder',
+          depth: 1,
+        })
+        data[key] = categories.docs as unknown[]
+        continue
+      }
+    }
+
+    if (Object.keys(data).length > 0) result.data = data
+    return result
+  }
 
   const dataEntryId =
     page.dataEntry != null && typeof page.dataEntry === 'object' && 'id' in page.dataEntry
@@ -114,4 +217,22 @@ export async function getPageBySlug(
   result.data = { [dataKey]: enrichedEntries }
 
   return result
+}
+
+/**
+ * Pobiera wszystkie slugi stron z kolekcji Pages (dla generateStaticParams).
+ * Zwraca tylko dokumenty z ustawionym slugiem.
+ */
+export async function getAllPageSlugs(): Promise<string[]> {
+  const payload = await getPayload()
+  const result = await payload.find({
+    collection: 'pages',
+    limit: 500,
+    depth: 0,
+    select: { slug: true },
+    locale: 'pl',
+  })
+  return result.docs
+    .map((doc) => doc.slug)
+    .filter((s): s is string => typeof s === 'string' && s.length > 0)
 }

@@ -2,18 +2,6 @@ import { getPayload } from '@/lib/payload'
 
 const DEFAULT_LOCALE = 'pl'
 
-export async function getNewsPageSettings(locale: string = DEFAULT_LOCALE) {
-  const payload = await getPayload()
-  const result = await payload.find({
-    collection: 'pages',
-    where: { slug: { equals: 'news' } },
-    locale: locale as 'pl' | 'en' | 'de',
-    limit: 1,
-    depth: 0,
-  })
-  return result.docs[0] ?? null
-}
-
 export async function getNavigation(locale: string = DEFAULT_LOCALE) {
   const payload = await getPayload()
   const global = await payload.findGlobal({

@@ -243,6 +243,62 @@ export interface Page {
    */
   dataEntry?: (number | null) | CustomCollectionEntry;
   /**
+   * Konfiguracja źródeł danych dla strony (wiele sekcji). Jeśli ustawione, zastępuje pojedyncze pole "Wpis danych".
+   */
+  dataSources?:
+    | (
+        | {
+            /**
+             * Klucz w `data[...]`, np. "pricing" albo "entries". Musi być unikalny w obrębie strony.
+             */
+            key: string;
+            entry: number | CustomCollectionEntry;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'customDataset';
+          }
+        | {
+            /**
+             * Klucz w `data[...]`, np. "posts". Musi być unikalny w obrębie strony.
+             */
+            key: string;
+            /**
+             * Ile postów pobrać.
+             */
+            limit?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'posts';
+          }
+        | {
+            /**
+             * Klucz w `data[...]`, np. "integrations". Musi być unikalny w obrębie strony.
+             */
+            key: string;
+            /**
+             * Ile integracji pobrać.
+             */
+            limit?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'integrations';
+          }
+        | {
+            /**
+             * Klucz w `data[...]`, np. "faq". Musi być unikalny w obrębie strony.
+             */
+            key: string;
+            /**
+             * Ile kategorii FAQ pobrać.
+             */
+            limit?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqCategories';
+          }
+      )[]
+    | null;
+  /**
    * Custom URL path (e.g. "pricing", "about"). If empty, path is determined by page type (faq, integrations, news).
    */
   slug?: string | null;
@@ -276,6 +332,26 @@ export interface Page {
           }
       )[]
     | null;
+  /**
+   * Tytuł w wynikach wyszukiwania i w social (np. Facebook). Jeśli pusty, używany jest tytuł strony.
+   */
+  metaTitle?: string | null;
+  /**
+   * Opis w wynikach wyszukiwania i podglądach linków (OG). Zalecane 150–160 znaków.
+   */
+  metaDescription?: string | null;
+  /**
+   * Obraz wyświetlany przy udostępnianiu linku (Facebook, LinkedIn itd.). Zalecane 1200×630 px.
+   */
+  openGraphImage?: (number | null) | Media;
+  /**
+   * Opcjonalny kanoniczny adres strony (np. przy duplikatach treści).
+   */
+  canonicalUrl?: string | null;
+  /**
+   * Zaznacz, aby wykluczyć stronę z indeksu wyszukiwarek (noindex).
+   */
+  noIndex?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -600,6 +676,42 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface PagesSelect<T extends boolean = true> {
   dataEntry?: T;
+  dataSources?:
+    | T
+    | {
+        customDataset?:
+          | T
+          | {
+              key?: T;
+              entry?: T;
+              id?: T;
+              blockName?: T;
+            };
+        posts?:
+          | T
+          | {
+              key?: T;
+              limit?: T;
+              id?: T;
+              blockName?: T;
+            };
+        integrations?:
+          | T
+          | {
+              key?: T;
+              limit?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faqCategories?:
+          | T
+          | {
+              key?: T;
+              limit?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   slug?: T;
   title?: T;
   shortDescription?: T;
@@ -631,6 +743,11 @@ export interface PagesSelect<T extends boolean = true> {
               blockName?: T;
             };
       };
+  metaTitle?: T;
+  metaDescription?: T;
+  openGraphImage?: T;
+  canonicalUrl?: T;
+  noIndex?: T;
   updatedAt?: T;
   createdAt?: T;
 }

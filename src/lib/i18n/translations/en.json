@@ -1,0 +1,18 @@
+{
+  "common": {
+    "more": "More →",
+    "readMore": "Read more →",
+    "yes": "Yes",
+    "no": "No",
+    "image": "Image",
+    "notFound": "Not found"
+  },
+  "sections": {
+    "integrations": "Integrations",
+    "faq": "FAQ",
+    "news": "News"
+  },
+  "aria": {
+    "localeSwitcher": "Choose language"
+  }
+}

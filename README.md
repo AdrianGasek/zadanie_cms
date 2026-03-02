@@ -79,11 +79,8 @@ Projekt zawiera **część serwerową**: konfigurację Payload CMS, API Next.js,
 | `GET /api/news-categories` | Lista kategorii (query: `locale`) |
 | `GET /api/navigation` | Global Navigation (query: `locale`) |
 | `GET /api/footer` | Global Footer (query: `locale`) |
-| `GET /api/news-page-settings` | Ustawienia strony /news (query: `locale`) |
-| `GET /api/integrations` | Lista integracji (query: `locale`) |
-| `GET /api/integrations-page-settings` | Ustawienia strony integracji (query: `locale`) |
+| `GET /api/integrations-list` | Lista integracji (query: `locale`) |
 | `GET /api/faq` | FAQ (query: `locale`) |
-| `GET /api/faq-page-settings` | Ustawienia strony FAQ (query: `locale`) |
 | `GET /api/custom-collection-definitions/[id]/fields` | Pola definicji własnej kolekcji |
 
 Payload REST (kolekcje, globals, auth) jest pod ścieżką `/api/*` obsługiwaną przez Payload (np. `/api/posts`, `/api/users`, `/api/globals/navigation`).
@@ -101,7 +98,7 @@ src/
   app/
     (payload)/          # Payload admin + REST
     (frontend)/         # Widoki: news, news-post/[slug]
-    api/                # Custom API (news, news-categories, navigation, footer, news-page-settings, integrations, faq, custom-collection-definitions)
+    api/                # Custom API (news, news-categories, navigation, footer, integrations, faq, custom-collection-definitions)
   collections/          # Payload: Media, Users, Categories, Posts, Pages, CustomCollectionDefinitions, CustomCollectionEntries, FaqCategories, Integrations
   globals/              # Payload: Navigation, Footer
   lib/
