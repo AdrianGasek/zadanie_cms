@@ -12,14 +12,18 @@ export const Media: CollectionConfig = {
   admin: {
     useAsTitle: 'alt',
     defaultColumns: ['alt', 'updatedAt'],
-    group: 'Content',
+    group: { pl: 'Treść', en: 'Content', de: 'Inhalt' },
+  },
+  labels: {
+    singular: { pl: 'Medium', en: 'Media', de: 'Medium' },
+    plural: { pl: 'Media', en: 'Media', de: 'Media' },
   },
   fields: [
     {
       name: 'alt',
       type: 'text',
       required: true,
-      label: 'Alt text',
+      label: { pl: 'Tekst alternatywny', en: 'Alt text', de: 'Alt-Text' },
     },
   ],
 }

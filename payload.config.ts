@@ -2,6 +2,9 @@ import sharp from 'sharp'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { buildConfig } from 'payload'
+import { en } from '@payloadcms/translations/languages/en'
+import { de } from '@payloadcms/translations/languages/de'
+import { pl } from '@payloadcms/translations/languages/pl'
 
 import { Media } from './src/collections/Media'
 import { Users } from './src/collections/Users'
@@ -29,6 +32,33 @@ export default buildConfig({
     Integrations,
   ],
   globals: [Navigation, Footer],
+  i18n: {
+    fallbackLanguage: 'pl',
+    supportedLanguages: { pl, en, de },
+    translations: {
+      pl: {
+        general: {
+          locale: 'Wersja językowa',
+          locales: 'Wersje językowe',
+          fallbackToDefaultLocale: 'Domyślna wersja językowa',
+        },
+      },
+      en: {
+        general: {
+          locale: 'Language version',
+          locales: 'Language versions',
+          fallbackToDefaultLocale: 'Default language version',
+        },
+      },
+      de: {
+        general: {
+          locale: 'Sprachversion',
+          locales: 'Sprachversionen',
+          fallbackToDefaultLocale: 'Standardsprachversion',
+        },
+      },
+    },
+  },
   secret: process.env.PAYLOAD_SECRET || '',
   db: postgresAdapter({
     pool: {

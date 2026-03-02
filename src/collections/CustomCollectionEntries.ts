@@ -40,9 +40,12 @@ export const CustomCollectionEntries: CollectionConfig = {
   admin: {
     useAsTitle: 'systemName',
     defaultColumns: ['systemName', 'customCollection', 'sortOrder', 'updatedAt'],
-    group: 'Content',
-    description:
-      'Produkcyjna wersja zestawu danych: podaj nazwę systemową (np. "cennik 1 szkic"), wybierz definicję danych, zapisz. Po wejściu w zapisany wpis dodawaj dane przyciskiem i polami klucz: wartość z definicji. Stronę możesz powiązać z konkretnym Data Entry w kolekcji Strony.',
+    group: { pl: 'Treść', en: 'Content', de: 'Inhalt' },
+    description: {
+      pl: 'Wpisy danych: podaj nazwę systemową, wybierz definicję danych, zapisz. W zapisanym wpisie dodawaj dane w polu Dane (klucz: wartość). Stronę możesz powiązać z konkretnym Data Entry w kolekcji Strony.',
+      en: 'Data entries: enter a system name, select a data definition, save. In the saved entry add data in the Data field (key: value). You can link a page to a specific Data Entry in the Pages collection.',
+      de: 'Dateneinträge: Systemname angeben, Datendefinition wählen, speichern. Im gespeicherten Eintrag Daten im Feld Daten hinzufügen (Schlüssel: Wert). Sie können eine Seite mit einem konkreten Dateneintrag in der Sammlung Seiten verknüpfen.',
+    },
   },
   labels: {
     singular: { pl: 'Wpis danych', en: 'Data Entry', de: 'Dateneintrag' },
@@ -53,10 +56,13 @@ export const CustomCollectionEntries: CollectionConfig = {
       name: 'systemName',
       type: 'text',
       required: true,
-      label: 'Nazwa systemowa',
+      label: { pl: 'Nazwa systemowa', en: 'System name', de: 'Systemname' },
       admin: {
-        description:
-          'Nazwa dla CMS (np. "cennik 1 szkic") – identyfikuje ten wpis w panelu. Po zapisaniu wpisu wybierz definicję danych i dodaj dane (klucz: wartość) w polu Dane.',
+        description: {
+          pl: 'Nazwa dla CMS (np. "cennik 1") – identyfikuje ten wpis w panelu. Po zapisaniu wybierz definicję i wypełnij pole Dane.',
+          en: 'Name for the CMS (e.g. "pricing 1") – identifies this entry in the panel. After saving, select the definition and fill the Data field.',
+          de: 'Name für das CMS (z. B. "Preise 1") – identifiziert diesen Eintrag im Panel. Nach dem Speichern Definition wählen und Feld Daten ausfüllen.',
+        },
       },
     },
     {
@@ -64,30 +70,36 @@ export const CustomCollectionEntries: CollectionConfig = {
       type: 'relationship',
       relationTo: 'custom-collection-definitions',
       required: true,
-      label: 'Definicja danych',
+      label: { pl: 'Definicja danych', en: 'Data definition', de: 'Datendefinition' },
       admin: {
-        description: 'Wybierz definicję (np. Cennik). Pola w "Dane" zależą od tej definicji – wypełnij i zapisz, aby dodać wpis do listy.',
+        description: {
+          pl: 'Wybierz definicję (np. Cennik). Pola w "Dane" zależą od tej definicji.',
+          en: 'Select a definition (e.g. Pricing). The Data field depends on this definition.',
+          de: 'Wählen Sie eine Definition (z. B. Preise). Das Feld Daten hängt von dieser Definition ab.',
+        },
       },
     },
     {
       name: 'sortOrder',
       type: 'number',
       defaultValue: 0,
-      label: 'Kolejność',
+      label: { pl: 'Kolejność', en: 'Sort order', de: 'Sortierung' },
       admin: {
-        description: 'Sortowanie (mniejsza wartość = wyżej).',
+        description: { pl: 'Sortowanie (mniejsza wartość = wyżej).', en: 'Sort order (lower value = higher).', de: 'Sortierung (kleinerer Wert = weiter oben).' },
       },
     },
     {
       name: 'data',
       type: 'json',
       required: false,
-      label: 'Dane',
+      label: { pl: 'Dane', en: 'Data', de: 'Daten' },
       admin: {
-        description:
-          'Dodawaj wpisy danych przyciskiem „Dodaj wpis danych”. Każdy wpis to zestaw pól z definicji (klucz: wartość). Zapisując dokument, wartości trafią do bazy jako JSON (tablica obiektów).',
+        description: {
+          pl: 'Dodawaj wpisy przyciskiem „Dodaj wpis danych”. Każdy wpis to zestaw pól z definicji (klucz: wartość).',
+          en: 'Add entries with the "Add data entry" button. Each entry is a set of fields from the definition (key: value).',
+          de: 'Einträge mit „Dateneintrag hinzufügen" hinzufügen. Jeder Eintrag ist ein Satz Felder aus der Definition (Schlüssel: Wert).',
+        },
         components: {
-          // Custom field component; Payload expects PayloadComponent<FieldClientComponent|FieldServerComponent> – cast to satisfy
           Field: CustomCollectionDataFieldComponent as any,
         },
       },

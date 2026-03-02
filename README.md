@@ -54,7 +54,7 @@ Projekt zawiera **część serwerową**: konfigurację Payload CMS, API Next.js,
 - **Users** — auth (email/hasło), role: admin, editor.
 - **Categories** — nazwa, slug (lokalizowane: pl, en, de).
 - **Posts** — tytuł, slug, shortDescription, featuredImage, publishedAt, readTimeMinutes, categories, content (Lexical rich text). Pola tekstowe z lokalizacją.
-- **Pages** — strony powiązane tylko z kolekcjami danych (np. wpis z Custom Collection Entries). Identyfikacja po slug (np. `news`, `faq`, `integrations`). Dane na stronie z pola Wpis danych (dataEntry).
+- **Pages** — strony powiązane z kolekcjami danych (np. wpis z Custom Collection Entries). Identyfikacja po slug (np. `news`, `faq`, `integrations`). Zawiera **metatagi pod SEO** (title, description, og:image itp.) oraz opcjonalnie **dataset** — dane do dynamicznego budowania treści. Dane na stronie z pola Wpis danych (dataEntry) lub z przypisanego typu strony.
 - **CustomCollectionDefinitions** — definicje własnych kolekcji (schemat pól).
 - **CustomCollectionEntries** — wpisy do kolekcji zdefiniowanych w CustomCollectionDefinitions.
 - **FaqCategories** — kategorie FAQ.
@@ -69,6 +69,7 @@ Projekt zawiera **część serwerową**: konfigurację Payload CMS, API Next.js,
 
 - Lokale: **pl** (domyślny), **en**, **de**.
 - Pola z `localized: true` mają wersje językowe w panelu Payload.
+- **Panel admina (i18n)** — interfejs Payload (przyciski, komunikaty, etykiety kolekcji i pól) jest dostępny po **polsku, angielsku i niemiecku**. Język wybiera się w ustawieniach użytkownika (preferencje) lub z nagłówka `Accept-Language`. Użyto `@payloadcms/translations` (pl, en, de) oraz przetłumaczonych labeli w kolekcjach i globals.
 
 ## API Next.js (Route Handlers)
 
@@ -84,6 +85,16 @@ Projekt zawiera **część serwerową**: konfigurację Payload CMS, API Next.js,
 | `GET /api/custom-collection-definitions/[id]/fields` | Pola definicji własnej kolekcji |
 
 Payload REST (kolekcje, globals, auth) jest pod ścieżką `/api/*` obsługiwaną przez Payload (np. `/api/posts`, `/api/users`, `/api/globals/navigation`).
+
+## Strony dynamiczne i dane własne
+
+Administrator może tworzyć **własne strony z custom danymi** (np. cenniki, listy, blogi, artykuły) i dołączać je do kolekcji **Pages**. W panelu Payload:
+
+- W **Definicjach danych** (CustomCollectionDefinitions) definiuje strukturę pól (np. nazwa, cena, opis dla cennika).
+- W **Wpisach danych** (CustomCollectionEntries) wypełnia treść — powstają listy wpisów (np. pozycje cennika).
+- W **Pages** tworzy stronę i konfiguruje **Źródła danych** (dataSources): dodaje sekcje — np. wpis z Custom Dataset (Data Entry), Posts, Integrations, FAQ — z przypisanym kluczem (np. `pricing`, `posts`). Opcjonalnie może powiązać stronę z jednym **Wpisem danych** (dataEntry), wtedy na stronie wyświetla się ten jeden wpis zamiast listy.
+
+**Frontend** na podstawie szablonu strony i danych z kolekcji Pages (slug, dataset, dataEntry, dataSources) **dynamicznie buduje widoki** — np. listę kart, pojedynczy artykuł lub stronę z custom polami.
 
 ## Routing (strony)
 

@@ -7,11 +7,129 @@ import {
   usePayloadAPI,
   useDocumentInfo,
   useConfig,
+  useTranslation,
   FieldLabel,
   FieldDescription,
   FieldError,
   fieldBaseClass,
 } from '@payloadcms/ui'
+
+type LocaleCode = 'pl' | 'en' | 'de'
+
+const ADMIN_STRINGS: Record<
+  LocaleCode,
+  {
+    dataLabel: string
+    fieldTypes: Record<string, string>
+    selectCollectionFirst: string
+    loadingFields: string
+    definitionNoFields: (name: string) => string
+    definitionNoFieldsGeneric: string
+    selectDefinitionFirst: string
+    whatToDo: string
+    reloadFields: string
+    dataEntryCount: (n: number) => string
+    remove: string
+    addDataEntry: string
+    save: string
+  }
+> = {
+  pl: {
+    dataLabel: 'Dane',
+    fieldTypes: {
+      text: 'tekst',
+      textarea: 'długi tekst',
+      richText: 'formatowany tekst',
+      number: 'liczba',
+      date: 'data',
+      checkbox: 'checkbox',
+      select: 'lista wyboru',
+      image: 'obraz',
+      group: 'grupa',
+    },
+    selectCollectionFirst: 'Wybierz najpierw kolekcję (np. Cennik), aby wyświetlić pola do wypełnienia.',
+    loadingFields: 'Ładowanie pól…',
+    definitionNoFields: (name) => `Definicja „${name}" nie ma jeszcze żadnych pól. Aby móc dodawać dane, dodaj pola w tej definicji (patrz poniżej).`,
+    definitionNoFieldsGeneric: 'Wybrana definicja nie ma jeszcze żadnych pól.',
+    selectDefinitionFirst: 'Wybierz definicję danych powyżej (pole Definicja danych), aby móc dodawać wpisy.',
+    whatToDo: 'Co zrobić: W menu wybierz Content → Definicje danych, otwórz definicję (np. Cenniki). W sekcji „Pola danych" dodaj co najmniej jedno pole (np. Klucz: price, Etykieta: Cena, Typ: Liczba). Zapisz. Potem wróć tutaj i kliknij „Załaduj pola ponownie".',
+    reloadFields: 'Załaduj pola ponownie',
+    dataEntryCount: (n) => `Wpis danych #${n}`,
+    remove: 'Usuń',
+    addDataEntry: '+ Dodaj wpis danych',
+    save: 'Zapisz',
+  },
+  en: {
+    dataLabel: 'Data',
+    fieldTypes: {
+      text: 'text',
+      textarea: 'long text',
+      richText: 'rich text',
+      number: 'number',
+      date: 'date',
+      checkbox: 'checkbox',
+      select: 'select (dropdown)',
+      image: 'image',
+      group: 'group',
+    },
+    selectCollectionFirst: 'Select a collection first (e.g. Pricing) to display fields to fill in.',
+    loadingFields: 'Loading fields…',
+    definitionNoFields: (name) => `Definition "${name}" has no fields yet. Add fields in this definition to add data (see below).`,
+    definitionNoFieldsGeneric: 'The selected definition has no fields yet.',
+    selectDefinitionFirst: 'Select a data definition above (Data Definition field) to add entries.',
+    whatToDo: 'What to do: In the menu go to Content → Data Definitions, open a definition (e.g. Pricing). In the "Data fields" section add at least one field (e.g. Key: price, Label: Price, Type: Number). Save. Then return here and click "Reload fields".',
+    reloadFields: 'Reload fields',
+    dataEntryCount: (n) => `Data entry #${n}`,
+    remove: 'Remove',
+    addDataEntry: '+ Add data entry',
+    save: 'Save',
+  },
+  de: {
+    dataLabel: 'Daten',
+    fieldTypes: {
+      text: 'Text',
+      textarea: 'Langtext',
+      richText: 'Formatierter Text',
+      number: 'Zahl',
+      date: 'Datum',
+      checkbox: 'Checkbox',
+      select: 'Auswahl (Dropdown)',
+      image: 'Bild',
+      group: 'Gruppe',
+    },
+    selectCollectionFirst: 'Wählen Sie zuerst eine Sammlung (z. B. Preise), um die auszufüllenden Felder anzuzeigen.',
+    loadingFields: 'Felder werden geladen…',
+    definitionNoFields: (name) => `Die Definition „${name}" hat noch keine Felder. Fügen Sie Felder in dieser Definition hinzu (siehe unten).`,
+    definitionNoFieldsGeneric: 'Die gewählte Definition hat noch keine Felder.',
+    selectDefinitionFirst: 'Wählen Sie oben eine Datendefinition (Feld Datendefinition), um Einträge hinzuzufügen.',
+    whatToDo: 'Vorgehen: Gehen Sie im Menü zu Content → Datendefinitionen, öffnen Sie eine Definition (z. B. Preise). Im Abschnitt „Datenfelder" fügen Sie mindestens ein Feld hinzu (z. B. Schlüssel: price, Bezeichnung: Preis, Typ: Zahl). Speichern. Dann hierher zurückkehren und „Felder neu laden" klicken.',
+    reloadFields: 'Felder neu laden',
+    dataEntryCount: (n) => `Dateneintrag #${n}`,
+    remove: 'Entfernen',
+    addDataEntry: '+ Dateneintrag hinzufügen',
+    save: 'Speichern',
+  },
+}
+
+function getLocaleCode(localeOrCode: unknown): LocaleCode {
+  if (typeof localeOrCode === 'string' && (localeOrCode === 'pl' || localeOrCode === 'en' || localeOrCode === 'de'))
+    return localeOrCode
+  const code =
+    localeOrCode && typeof localeOrCode === 'object' && 'code' in localeOrCode
+      ? (localeOrCode as { code?: string }).code
+      : null
+  if (code === 'pl' || code === 'en' || code === 'de') return code
+  return 'en'
+}
+
+function resolveLabel(label: string | Record<string, string> | undefined, locale: LocaleCode): string {
+  if (typeof label === 'string') return label
+  if (label && typeof label === 'object') {
+    const o = label as Record<string, string>
+    return o[locale] ?? o.en ?? o.pl ?? o.de ?? Object.values(o)[0] ?? ADMIN_STRINGS[locale].dataLabel
+  }
+  return ADMIN_STRINGS[locale].dataLabel
+}
 
 type DefinitionField = {
   key: string
@@ -66,25 +184,25 @@ function getDisplayString(val: unknown): string {
   return String(val)
 }
 
-const FIELD_TYPE_LABELS: Record<string, string> = {
-  text: 'tekst',
-  textarea: 'długi tekst',
-  richText: 'formatowany tekst',
-  number: 'liczba',
-  date: 'data',
-  checkbox: 'checkbox',
-  select: 'lista wyboru',
-  image: 'obraz',
-  group: 'grupa',
-}
-function getFieldTypeLabel(type: string): string {
-  return FIELD_TYPE_LABELS[type] ?? type
+function getFieldTypeLabel(type: string, locale: LocaleCode): string {
+  return ADMIN_STRINGS[locale].fieldTypes[type] ?? type
 }
 
 export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFieldProps) {
   const { field: fieldConfig, path: pathFromProps, readOnly } = props
-  const label = fieldConfig?.label ?? 'Dane'
-  const description = fieldConfig?.admin?.description
+  const { i18n } = useTranslation()
+  const localeFromUrlOrPref = i18n?.language ?? 'en'
+  const locale = getLocaleCode(localeFromUrlOrPref)
+  const t = ADMIN_STRINGS[locale]
+
+  const label = resolveLabel(
+    typeof fieldConfig?.label === 'object' || typeof fieldConfig?.label === 'string' ? fieldConfig?.label : undefined,
+    locale
+  )
+  const description = typeof fieldConfig?.admin?.description === 'object'
+    ? (fieldConfig.admin.description as Record<string, string>)[locale]
+      ?? (fieldConfig.admin.description as Record<string, string>).en
+    : fieldConfig?.admin?.description
 
   const { value, setValue, path, showError, disabled } = useField<
     Record<string, unknown> | Record<string, unknown>[]
@@ -311,7 +429,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <FieldLabel label={label} path={path} required={false} />
         <div className={`${fieldBaseClass}__wrap`}>
           <p className="text-sm text-neutral-500">
-            Wybierz najpierw kolekcję (np. Cennik), aby wyświetlić pola do wypełnienia.
+            {t.selectCollectionFirst}
           </p>
         </div>
         {description && <FieldDescription description={description} path={path} />}
@@ -332,24 +450,24 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div className={`${fieldBaseClass}__wrap`}>
           <p className="text-sm text-neutral-500">
             {definitionLoading
-              ? 'Ładowanie pól…'
+              ? t.loadingFields
               : definitionId != null
                 ? definitionName
-                  ? `Definicja „${definitionName}" nie ma jeszcze żadnych pól. Aby móc dodawać dane, dodaj pola w tej definicji (patrz poniżej).`
-                  : 'Wybrana definicja nie ma jeszcze żadnych pól.'
-                : 'Wybierz definicję danych powyżej (pole Definicja danych), aby móc dodawać wpisy.'}
+                  ? t.definitionNoFields(definitionName)
+                  : t.definitionNoFieldsGeneric
+                : t.selectDefinitionFirst}
           </p>
           {definitionId != null && !definitionLoading && (
             <>
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
-                <strong>Co zrobić:</strong> W menu wybierz <strong>Content → Definicje danych</strong>, otwórz definicję (np. Cenniki). W sekcji <strong>„Pola danych"</strong> dodaj co najmniej jedno pole (np. Klucz: <code>price</code>, Etykieta: Cena, Typ: Liczba). Zapisz. Potem wróć tutaj i kliknij „Załaduj pola ponownie".
+                {t.whatToDo}
               </p>
               <button
                 type="button"
                 onClick={() => setDefinitionFetchKey((k) => k + 1)}
                 className="mt-2 text-sm px-3 py-1.5 rounded border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
               >
-                Załaduj pola ponownie
+                {t.reloadFields}
               </button>
             </>
           )}
@@ -383,7 +501,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div key={key} className="border border-neutral-200 dark:border-neutral-600 rounded-lg p-3 mt-2 bg-white dark:bg-neutral-900/30">
           <div className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
           </div>
           <div className="space-y-4">
             {nestedFields.map((subF) =>
@@ -401,7 +519,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div key={key} className="space-y-1">
           <label htmlFor={inputId} className="block text-sm font-medium">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
             {required && ' *'}
           </label>
           <textarea
@@ -423,7 +541,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div key={key} className="space-y-1">
           <label htmlFor={inputId} className="block text-sm font-medium">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
             {required && ' *'}
           </label>
           <select
@@ -452,7 +570,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div key={key} className="space-y-1">
           <label htmlFor={inputId} className="block text-sm font-medium">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
             {required && ' *'}
           </label>
           <textarea
@@ -479,7 +597,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div key={key} className="space-y-1">
           <label htmlFor={inputId} className="block text-sm font-medium">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
             {required && ' *'}
           </label>
           <input
@@ -507,7 +625,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div key={key} className="space-y-1">
           <label htmlFor={inputId} className="block text-sm font-medium">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
             {required && ' *'}
           </label>
           <input
@@ -535,7 +653,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
           />
           <label htmlFor={inputId} className="text-sm font-medium">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
             {required && ' *'}
           </label>
         </div>
@@ -553,7 +671,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
         <div key={key} className="space-y-1">
           <label htmlFor={inputId} className="block text-sm font-medium">
             {f.label ?? key}
-            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+            <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
             {required && ' *'}
           </label>
           <select
@@ -577,7 +695,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
       <div key={key} className="space-y-1">
         <label htmlFor={inputId} className="block text-sm font-medium">
           {f.label ?? key}
-          <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type)})</span>
+          <span className="text-xs text-neutral-400 font-normal ml-1">(typ: {getFieldTypeLabel(f.type, locale)})</span>
           {required && ' *'}
         </label>
         <input
@@ -607,7 +725,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
             >
               <div className="flex items-center justify-between gap-2 mb-3">
                 <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                  Wpis danych #{index + 1}
+                  {t.dataEntryCount(index + 1)}
                 </span>
                 {displayRows.length > 1 && (
                   <button
@@ -616,7 +734,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
                     disabled={isDisabled}
                     className="text-xs px-2 py-1 rounded border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
-                    Usuń
+                    {t.remove}
                   </button>
                 )}
               </div>
@@ -631,7 +749,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
             disabled={isDisabled}
             className="w-full py-2 px-3 rounded border-2 border-dashed border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-primary-500 hover:text-primary-600 dark:hover:border-primary-400 dark:hover:text-primary-400 text-sm font-medium transition-colors"
           >
-            + Dodaj wpis danych
+            {t.addDataEntry}
           </button>
           <div className="pt-4 mt-4 border-t border-neutral-200 dark:border-neutral-700">
             <button
@@ -640,7 +758,7 @@ export function CustomCollectionDataFieldComponent(props: CustomCollectionDataFi
               disabled={isDisabled}
               className="px-4 py-2 rounded bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-medium disabled:opacity-50 disabled:pointer-events-none"
             >
-              Zapisz
+              {t.save}
             </button>
           </div>
         </div>

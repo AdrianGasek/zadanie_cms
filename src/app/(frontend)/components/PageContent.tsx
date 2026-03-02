@@ -6,6 +6,9 @@ import { pathWithLocale } from '@/lib/i18n/routes'
 import Link from 'next/link'
 import { LocaleSwitcher } from './LocaleSwitcher'
 
+// TODO: przenieść to do innego folderu w projekcie, zrobić review, rozbić na komponenty
+// Wywaliłem pageType, bo nie ma go w payload-types.ts trzeba potem naprawić komponent
+
 type Props = {
   page: Page
   data?: PageCollectionData
@@ -203,12 +206,12 @@ export function PageContent({ page, data, locale: localeProp }: Props) {
     <article className="dynamic-page">
       <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-        <h1 className="text-3xl font-bold">{title}</h1>
-        {shortDescription && (
-          <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">
-            {shortDescription}
-          </p>
-        )}
+          <h1 className="text-3xl font-bold">{title}</h1>
+          {shortDescription && (
+            <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">
+              {shortDescription}
+            </p>
+          )}
         </div>
         <LocaleSwitcher currentLocale={locale} basePath={slug ? `/${slug}` : undefined} ariaLabel={t.aria.localeSwitcher} />
       </header>
@@ -219,90 +222,90 @@ export function PageContent({ page, data, locale: localeProp }: Props) {
         || dataSections.some(([k]) => k === 'integrations')) &&
         Array.isArray((data?.['integrations'] ?? collectionItems)) &&
         (data?.['integrations'] ?? collectionItems)!.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold mb-4">{t.sections.integrations}</h2>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {((data?.['integrations'] ?? collectionItems) as Integration[]).map((item) => (
-              <li
-                key={item.id}
-                className="rounded-lg border p-4 flex items-start gap-3"
-              >
-                {typeof item.logo === 'object' && item.logo?.url && (
-                  <img
-                    src={item.logo.url}
-                    alt={item.name}
-                    className="h-10 w-10 rounded object-contain shrink-0"
-                  />
-                )}
-                <div>
-                  <h3 className="font-medium">{item.name}</h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-                    {item.shortDescription}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          <section className="mb-10">
+            <h2 className="text-xl font-semibold mb-4">{t.sections.integrations}</h2>
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {((data?.['integrations'] ?? collectionItems) as Integration[]).map((item) => (
+                <li
+                  key={item.id}
+                  className="rounded-lg border p-4 flex items-start gap-3"
+                >
+                  {typeof item.logo === 'object' && item.logo?.url && (
+                    <img
+                      src={item.logo.url}
+                      alt={item.name}
+                      className="h-10 w-10 rounded object-contain shrink-0"
+                    />
+                  )}
+                  <div>
+                    <h3 className="font-medium">{item.name}</h3>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                      {item.shortDescription}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
       {/* faq – dedykowany blok (kategorie FAQ) */}
       {((pageType === 'faq' && Array.isArray(collectionItems) && collectionItems.length > 0)
         || dataSections.some(([k]) => k === 'faq')) &&
         Array.isArray((data?.['faq'] ?? collectionItems)) &&
         (data?.['faq'] ?? collectionItems)!.length > 0 && (
-        <section className="mb-10 space-y-8">
-          <h2 className="text-xl font-semibold mb-4">{t.sections.faq}</h2>
-          {((data?.['faq'] ?? collectionItems) as FaqCategory[]).map((category) => (
-            <div key={category.id} className="rounded-lg border p-4">
-              <h3 className="font-medium mb-2">{category.name}</h3>
-              {category.shortDescription && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
-                  {category.shortDescription}
-                </p>
-              )}
-              {category.items && category.items.length > 0 && (
-                <ul className="space-y-2">
-                  {category.items.map((item, i) => (
-                    <li key={item.id ?? i}>
-                      <strong className="text-sm">{item.question}</strong>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">
-                        {item.answer}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </section>
-      )}
+          <section className="mb-10 space-y-8">
+            <h2 className="text-xl font-semibold mb-4">{t.sections.faq}</h2>
+            {((data?.['faq'] ?? collectionItems) as FaqCategory[]).map((category) => (
+              <div key={category.id} className="rounded-lg border p-4">
+                <h3 className="font-medium mb-2">{category.name}</h3>
+                {category.shortDescription && (
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+                    {category.shortDescription}
+                  </p>
+                )}
+                {category.items && category.items.length > 0 && (
+                  <ul className="space-y-2">
+                    {category.items.map((item, i) => (
+                      <li key={item.id ?? i}>
+                        <strong className="text-sm">{item.question}</strong>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">
+                          {item.answer}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </section>
+        )}
 
       {/* news – dedykowany blok (posty) */}
       {((pageType === 'news' && Array.isArray(collectionItems) && collectionItems.length > 0)
         || dataSections.some(([k]) => k === 'news' || k === 'posts')) &&
         Array.isArray((data?.['news'] ?? data?.['posts'] ?? collectionItems)) &&
         (data?.['news'] ?? data?.['posts'] ?? collectionItems)!.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold mb-4">{t.sections.news}</h2>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {((data?.['news'] ?? data?.['posts'] ?? collectionItems) as Post[]).map((post) => (
-              <li key={post.id} className="rounded-lg border p-4">
-                <h3 className="font-medium">{post.title}</h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 line-clamp-2">
-                  {post.shortDescription}
-                </p>
-                <Link
-                  href={pathWithLocale(`/news/${post.slug}`, locale)}
-                  className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-2 inline-block"
-                >
-                  {t.common.readMore}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          <section className="mb-10">
+            <h2 className="text-xl font-semibold mb-4">{t.sections.news}</h2>
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {((data?.['news'] ?? data?.['posts'] ?? collectionItems) as Post[]).map((post) => (
+                <li key={post.id} className="rounded-lg border p-4">
+                  <h3 className="font-medium">{post.title}</h3>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 line-clamp-2">
+                    {post.shortDescription}
+                  </p>
+                  <Link
+                    href={pathWithLocale(`/news/${post.slug}`, locale)}
+                    className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-2 inline-block"
+                  >
+                    {t.common.readMore}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
       {/* Dowolny inny pageType z Page Type Collections – generyczna lista lub własna kolekcja */}
       {pageType !== 'integrations' &&

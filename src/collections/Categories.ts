@@ -11,7 +11,11 @@ export const Categories: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'updatedAt'],
-    group: 'Content',
+    group: { pl: 'Treść', en: 'Content', de: 'Inhalt' },
+  },
+  labels: {
+    singular: { pl: 'Kategoria', en: 'Category', de: 'Kategorie' },
+    plural: { pl: 'Kategorie', en: 'Categories', de: 'Kategorien' },
   },
   fields: [
     {
@@ -19,14 +23,16 @@ export const Categories: CollectionConfig = {
       type: 'text',
       required: true,
       localized: true,
+      label: { pl: 'Nazwa', en: 'Name', de: 'Name' },
     },
     {
       name: 'slug',
       type: 'text',
       required: true,
       unique: true,
+      label: { pl: 'Slug', en: 'Slug', de: 'Slug' },
       admin: {
-        description: 'URL-friendly identifier',
+        description: { pl: 'Identyfikator przyjazny w URL', en: 'URL-friendly identifier', de: 'URL-freundliche Kennung' },
       },
     },
   ],

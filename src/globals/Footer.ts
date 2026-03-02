@@ -5,46 +5,47 @@ export const Footer: GlobalConfig = {
   access: {
     read: () => true,
   },
-  label: { singular: 'Footer', plural: 'Footer' },
+  label: 'Footer',
   fields: [
     {
       name: 'contactEmail',
       type: 'text',
       required: true,
-      label: 'Contact email',
+      label: { pl: 'E-mail kontaktowy', en: 'Contact email', de: 'Kontakt-E-Mail' },
     },
     {
       name: 'contactPhone',
       type: 'text',
       required: true,
-      label: 'Contact phone',
+      label: { pl: 'Telefon kontaktowy', en: 'Contact phone', de: 'Kontakttelefon' },
     },
     {
       name: 'linkColumns',
       type: 'array',
-      label: 'Link columns',
-      labels: { singular: 'Column', plural: 'Columns' },
+      label: { pl: 'Kolumny linków', en: 'Link columns', de: 'Link-Spalten' },
+      labels: { singular: { pl: 'Kolumna', en: 'Column', de: 'Spalte' }, plural: { pl: 'Kolumny', en: 'Columns', de: 'Spalten' } },
       admin: {
-        description: 'Footer link columns (e.g. Registration, Sign in, Search, Privacy policy, Terms, FAQ).',
+        description: { pl: 'Kolumny linków w stopce (np. Rejestracja, Zaloguj, Szukaj, Polityka prywatności, Regulamin, FAQ).', en: 'Footer link columns (e.g. Registration, Sign in, Search, Privacy policy, Terms, FAQ).', de: 'Fußzeilen-Linkspalten (z. B. Registrierung, Anmelden, Suche, Datenschutz, AGB, FAQ).' },
       },
       fields: [
         {
           name: 'links',
           type: 'array',
-          label: 'Links',
-          labels: { singular: 'Link', plural: 'Links' },
+          label: { pl: 'Linki', en: 'Links', de: 'Links' },
+          labels: { singular: { pl: 'Link', en: 'Link', de: 'Link' }, plural: { pl: 'Linki', en: 'Links', de: 'Links' } },
           fields: [
             {
               name: 'label',
               type: 'text',
               required: true,
               localized: true,
+              label: { pl: 'Etykieta', en: 'Label', de: 'Bezeichnung' },
             },
             {
               name: 'url',
               type: 'text',
               required: true,
-              label: 'URL',
+              label: { pl: 'URL', en: 'URL', de: 'URL' },
             },
           ],
         },

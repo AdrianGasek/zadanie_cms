@@ -12,7 +12,11 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email', 'updatedAt'],
-    group: 'System',
+    group: { pl: 'System', en: 'System', de: 'System' },
+  },
+  labels: {
+    singular: { pl: 'Użytkownik', en: 'User', de: 'Benutzer' },
+    plural: { pl: 'Użytkownicy', en: 'Users', de: 'Benutzer' },
   },
   fields: [
     {
@@ -20,8 +24,8 @@ export const Users: CollectionConfig = {
       type: 'select',
       hasMany: true,
       options: [
-        { label: 'Admin', value: 'admin' },
-        { label: 'Editor', value: 'editor' },
+        { label: { pl: 'Admin', en: 'Admin', de: 'Admin' }, value: 'admin' },
+        { label: { pl: 'Edytor', en: 'Editor', de: 'Redakteur' }, value: 'editor' },
       ],
       access: {
         read: ({ req }) => Boolean(req.user?.roles?.includes('admin')),

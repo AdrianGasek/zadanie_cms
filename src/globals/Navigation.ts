@@ -5,15 +5,15 @@ export const Navigation: GlobalConfig = {
   access: {
     read: () => true,
   },
-  label: { singular: 'Navigation', plural: 'Navigation' },
+  label: 'Navigation',
   fields: [
     {
       name: 'tabs',
       type: 'array',
-      label: 'Menu tabs',
-      labels: { singular: 'Tab', plural: 'Tabs' },
+      label: { pl: 'Zakładki menu', en: 'Menu tabs', de: 'Menü-Register' },
+      labels: { singular: { pl: 'Zakładka', en: 'Tab', de: 'Register' }, plural: { pl: 'Zakładki', en: 'Tabs', de: 'Register' } },
       admin: {
-        description: 'Top-level tabs (e.g. Platform, Integrations, Resources). Order determines display order.',
+        description: { pl: 'Zakładki najwyższego poziomu (np. Platforma, Integracje, Zasoby). Kolejność określa wyświetlanie.', en: 'Top-level tabs (e.g. Platform, Integrations, Resources). Order determines display order.', de: 'Hauptregister (z. B. Plattform, Integrationen, Ressourcen). Reihenfolge bestimmt die Anzeige.' },
       },
       fields: [
         {
@@ -21,13 +21,13 @@ export const Navigation: GlobalConfig = {
           type: 'text',
           required: true,
           localized: true,
-          label: 'Tab label',
+          label: { pl: 'Etykieta zakładki', en: 'Tab label', de: 'Register-Label' },
         },
         {
           name: 'menuItems',
           type: 'array',
-          label: 'Menu items',
-          labels: { singular: 'Item', plural: 'Items' },
+          label: { pl: 'Pozycje menu', en: 'Menu items', de: 'Menüpunkte' },
+          labels: { singular: { pl: 'Pozycja', en: 'Item', de: 'Eintrag' }, plural: { pl: 'Pozycje', en: 'Items', de: 'Einträge' } },
           fields: [
             {
               name: 'label',
@@ -39,8 +39,8 @@ export const Navigation: GlobalConfig = {
               name: 'url',
               type: 'text',
               required: true,
-              label: 'URL',
-              admin: { description: 'Link target (e.g. /page or https://...)' },
+              label: { pl: 'URL', en: 'URL', de: 'URL' },
+              admin: { description: { pl: 'Cel linku (np. /strona lub https://...)', en: 'Link target (e.g. /page or https://...)', de: 'Link-Ziel (z. B. /seite oder https://...)' } },
             },
           ],
         },
